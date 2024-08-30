@@ -1,70 +1,76 @@
-import { Image, StyleSheet, Platform } from 'react-native';
-
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { StyleSheet, Text, Pressable } from 'react-native';
+import Animated, { useSharedValue, withSpring, withTiming, useAnimatedStyle } from 'react-native-reanimated';
+import { useEffect } from 'react';
 
 export default function HomeScreen() {
+  const width = useSharedValue(100);
+  const opacity = useSharedValue(1);
+  const titlePosition = useSharedValue(-50);
+  const backgroundColor = useSharedValue('#07073c');
+
+  useEffect(() => {
+    //Animacion de deslizamiento del titulo
+    titlePosition.value = withTiming(-10, { duration: 500 });
+  }, []);
+
+  const handlePress = () => {
+    width.value = withSpring(width.value + 50);
+    
+    // Animacion de desvanecimiento del titulo
+    opacity.value = withTiming(0, { duration: 500 });
+
+    // Animacion de desvanecimiento del fondo
+    backgroundColor.value = withTiming('#303546', { duration: 500 });
+
+    
+  };
+
+
+
+  const animatedTitleStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ translateY: titlePosition.value }],
+      opacity: opacity.value,
+    };
+  });
+
+  const animatedBackgroundStyle = useAnimatedStyle(() => {
+    return {
+      backgroundColor: backgroundColor.value,
+    };
+  });
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({ ios: 'cmd + d', android: 'cmd + m' })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <Animated.View style={[styles.container, animatedBackgroundStyle]}>
+      <Animated.Text style={[styles.titleContainer, animatedTitleStyle]}>
+        Trabajo Practico 8
+      </Animated.Text>
+      <Pressable onPress={handlePress} style={styles.button}>
+        <Text style={{ color: 'white' }}>Iniciar</Text>
+      </Pressable>
+    </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
+  container: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    gap: 8,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
+  titleContainer: {
+    color: 'white',
+    fontSize: 24,
     position: 'absolute',
+    top: 400, 
+  },
+  button: {
+    position: 'absolute',
+    bottom: 50, 
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+    borderRadius: 4,
+    elevation: 3,
+    backgroundColor: '#0b0bbf',
   },
 });
